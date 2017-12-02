@@ -1,0 +1,1553 @@
+---
+title: 'From Data To Decisions'
+subtitle: 'Modern Data Analysis with R'
+author: "Dwight Wynne"
+date: "December 2, 2017"
+output: slidy_presentation
+font_adjustment: +2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE)#, tidy.opts = list(width.cutoff = 70))
+```
+
+## Goals of This Workshop
+
+- Understand the six-step modeling process, how each step works, and why each step is important
+
+- Learn powerful techniques for analyzing and modeling data and understand why they work
+
+- Write code to start implementing models in R
+
+## How This Workshop Works
+
+Within each module you can expect:
+
+- Theory: what and why
+
+- Example code you can copy
+
+- Activities where you write your own code (using the example as a template)
+
+I expect you to have some struggles with the activities! Work with people around you to tackle the problem, and ask me for help!
+
+## What is Statistical Learning?
+
+- Any technique used for understanding data
+
+- **Supervised** statistical learning: we want to understand relationships between one or more inputs and a clear *output* variable
+
+- **Unsupervised** statistical learning: we want to understand relationships between multiple variables, but there is no clear output
+
+## Statistical Learning: Model Assumptions
+
+- *Parametric* techniques assume specific mathematical relationships between the variables
+
+- *Nonparametric* techniques make no assumptions about those mathematical relationships
+
+## Statistical Learning: Goals
+
+- *Regression* techniques predict a numerical output from one or more inputs
+
+- *Classification* techniques predict a category from one or more inputs
+
+- Both regression and classification techniques can use any kind of variable as an _input_
+
+## The Number 1 Question You Must Ask Before You Start Modeling {.build .flexbox .vcenter}
+
+
+### Who Are You Modeling For?
+
+
+## Trade-off 1: Accuracy vs. Interpretability
+
+- Which is more important:
+
+    - Getting the right answer?
+
+    - Explaining how you got that answer?
+
+## Trade-off 2: Bias vs. Variance
+
+- Your model will be off. Would you rather it be...
+
+    - Consistently over- or under-estimating your data?
+    
+    - Accurate, on average, but all over the place?
+  
+## Trade-off 3: Current vs. Future Data
+
+- Which is more important to get right:
+
+    - Explaining current observations?
+    
+    - Predicting future observations?
+    
+## Statistical Answers to Trade-offs
+
+- Techniques vary in their interpretability, but statisticians _penalize complexity_ to find the simplest model that will work
+
+- Statisticians reduce the _total amount_ of error, and don't care if they have to trade an increase in bias for a decrease in variance (or vice versa)
+
+- Statisticians always watch for _overfitting_ randomness in the current data and typically evaluate techniques based on their ability to predict future data
+
+## The Data to Decisions Pipeline
+
+- In order to make informed decisions, we have to answer two questions:
+
+    - What is happening?
+    - What is going to happen?
+
+- We *must* answer the first question before we can even attempt to answer the second
+
+## The Six-Step Modeling Process
+
+### Background Analysis
+
+- What data do I have? What do the variables mean? What values do they take?
+
+### Exploratory Analysis
+
+- What are the main features of my data set? How do those features interact? Is there anything unexpected?
+
+### Feature Selection
+
+- What do I want to predict? What features will help me make that prediction, and which appear to be irrelevant?
+
+## The Six-Step Modeling Process
+
+### Model Building
+
+- What kind of model is appropriate to use to predict an outcome? How should I combine the features to make the prediction?
+
+### Model Validation
+
+- Which of the models I made in the previous step is best?
+
+### Model Interpretation
+
+- What outcomes does this model suggest will happen for future observations? How do I interpret the effect of each feature in a real-world context? What does this suggest about my decisions?
+
+
+## Introduction to R Studio
+
+- R is a combination statistical software and specialized programming language
+
+- R Studio makes it easier to do data analysis with R by automating many non-coding aspects of data analysis
+
+- Commands are run in the Console window
+
+- To make coding easier, write code in a script, then highlight it and click Run
+
+- Click $File \rightarrow New File \rightarrow R \  Script \ $to open a new R script
+
+## Basics of R Coding
+
+- Basic arithmetic operations can be typed in directly
+
+- More complex functions are called using the syntax `function(arguments)`
+
+- The assignment operator (`<-`) creates a new variable
+
+- The concatenate function (`c()`) creates a vector
+
+```{r example1, echo = T}
+a <- c(2, 4, 6)
+b <- sqrt(a)
+print(b)
+``` 
+
+## Basics of R Coding
+
+Important Notes:
+
+- The square root function is applied to every element in the vector `a`
+
+- When we store a variable, nothing is output to the Console
+
+- To show a variable's value in the Console, use the command `print(variable)`
+
+- We can also look up the variable in the *Environment* tab
+
+## R Syntax and Debugging: Tips
+
+- When you start out you will forget the name of functions or arguments! This is okay and expected!
+
+- When you get good at coding you will still forget the name of functions and arguments!
+
+## R Syntax and Debugging: Tips
+
+- When you start out you will forget the name of functions or arguments! This is okay and expected!
+
+- When you get good at coding you will still forget the name of functions and arguments!
+
+- When you start out you will make a lot of typos! This is okay and expected!
+
+- When you get good at coding you will make even more typos! You just won't take as long to figure out the error!
+
+- Write everything in a Script, highlight what you want to run, and click `Run`. Then you can fix the error and run it again, instead of messing around in the Console. This will save you uncountably many hours fixing your typos.
+
+## R Syntax and Debugging: Tips
+
+- If you get an error message, something's wrong. If you get a warning message, you're probably okay.
+
+- If you get an error message, check the following:
+
+    - Did you capitalize correctly?
+
+    - Does every left parenthesis have a matching right one () in the correct place?
+
+    - Does every quotation mark have a matching one "" at the end of the quote?
+
+    - R Studio thinks it's being helpful by automatically adding the second parenthesis/quotation mark, but it isn't!
+
+- Google is your friend: many people have gotten similarly arcane error messages
+
+## Introduction to the tidyverse
+
+- R is extended by thousands of *packages* that perform specific statistical and analytical functions
+
+- The *tidyverse* is a set of packages designed to make working with data easy
+
+```{r load tidyverse, eval = T, echo = T, warning = FALSE}
+library(tidyverse)
+```
+
+## Importing Data
+
+- Click the `Import Dataset` button in the `Environment` window and select "From CSV..."
+
+- Other formats (e.g. Excel) are also supported natively by the tidyverse
+
+- Find your data file
+
+- Name your file in the *Name* box
+
+- Click `Import`
+
+- There are many options for getting your data to import correctly
+
+```{r import data, echo = F, message = F}
+library(readr)
+APR <- read_csv("~/RWorkshop/December 2017/D1_football_APR_2014_v2.csv")
+```
+
+## Background Analysis Activity
+
+View your dataset. For example, I call my dataset `APR`, so I would type:
+
+```{r View data, echo = T, eval= F}
+View(APR)
+```
+
+in the script, and then highlight it and click the `Run` button.
+
+Figure out what the following variables represent:
+
+- `SCL_NAME`
+- `SCL_HBCU`
+- `SCL_PRIVATE`
+- `NUM_OF_ATHLETES_2014`
+
+
+
+## Manipulating Data with dplyr
+
+There are five main objectives of data manipulation:
+
+- Select specific observations (`filter()`)
+
+- Select specific variables (`select()`)
+
+- Sort observations based on the value of a variable (`arrange()`)
+
+- Create new variables based on existing variables (`mutate()`)
+
+- Summarize the values of a variable (`summarize()`)
+
+## The Pipe Operator
+
+The `dplyr` library includes a "pipe" operator (`%>%`) that makes code more understandable. The pipe operator means:
+
+- Take the data frame on the left side of the pipe
+
+- Perform the command on the right side of the pipe
+
+## Selecting Observations
+
+```{r filter}
+# Select FBS universities
+
+APR %>% filter(SUBDIVISION == 1)
+```
+
+## Using Multiple Criteria
+
+```{r filter1}
+# Select public schools in Pac-12
+APR %>% filter(SCL_PRIVATE == 0, CONFERENCE == "Pac-12 Conference")
+
+```
+
+## Filtering Out Observations
+
+```{r filter2}
+# Filter out SEC
+APR %>% filter(CONFERENCE != "Southeastern Conference")
+```
+
+## Selecting Variables
+
+```{r select}
+APR %>% select(SCL_NAME, APR_2014)
+```
+
+## Sorting Observations in Ascending Order (A-Z)
+
+```{r sort1}
+# Sort ascending by conference name
+APR %>% arrange(CONFERENCE) %>% select(SCL_NAME, CONFERENCE)
+```
+
+## Sorting Observations in Descending Order (Z-A)
+
+```{r sort2}
+# Sort descending by APR
+APR %>% arrange(desc(APR_2014)) %>% select(SCL_NAME, APR_2014)
+```
+
+## Sorting Using Multiple Criteria
+
+```{r sort3}
+# Sort by conference, then by APR
+APR %>% arrange(CONFERENCE, desc(APR_2014)) %>% select(SCL_NAME, APR_2014, CONFERENCE)
+```
+
+## Creating New Variables
+
+```{r mutate1}
+# Eligibility and retention rate in Percent
+APR %>% mutate(ELIG_PCT = ELIG_RATE_2014*100, RET_PCT = RET_RATE_2014*100) %>% select(SCL_NAME, ELIG_PCT, RET_PCT)
+```
+
+
+## Summarizing Variables
+
+```{r summarize}
+APR %>% summarize(count = n(), mean_APR = mean(APR_2014), mean_ELIG = mean(ELIG_RATE_2014), mean_RET = mean(RET_RATE_2014))
+```
+
+## Grouping and Summarizing
+
+- Group by the value of a variable and then summarize a numerical variable within each group
+
+```{r group and summarize}
+APR %>% group_by(SCL_PRIVATE) %>% summarize(count = n(), mean_ELIG = mean(ELIG_RATE_2014), mean_RET = mean(RET_RATE_2014), mean_APR = mean(APR_2014))
+```
+
+
+## Storing a Modified Data Set
+
+- Just assign the result of your manipulation to a new variable:
+
+```{r manipulate and store}
+APR_new <- APR %>% filter(SCL_PRIVATE == 0, CONFERENCE == "Pac-12 Conference") %>% mutate(ELIG_PCT = ELIG_RATE_2014*100, RET_PCT = RET_RATE_2014*100) %>% select(SCL_NAME, ELIG_PCT, RET_PCT)
+print(APR_new)
+```
+
+## Data Manipulation Activity
+
+Question 1: Which private school has the lowest 2014 APR?
+
+Question 2: Which conference has the highest average 2014 APR?
+
+## Data Manipulation Activity
+
+Question 1: Which private school has the lowest 2014 APR?
+
+Question 2: Which conference has the highest average 2014 APR?
+
+Each of these questions requires you to chain together multiple data manipulation commands with the pipe (`%>%`).
+
+For each question, ask yourself before writing any code:
+
+- What manipulations do I need to do to answer this question?
+
+- What order do I need to do them in?
+
+## Activity Solution
+
+```{r activity 1-1}
+APR %>% filter(SCL_PRIVATE == 1) %>% arrange(APR_2014) %>% select(SCL_NAME, APR_2014)
+```
+
+## Activity Solution
+
+``` {r activity 1-2}
+APR %>% group_by(CONFERENCE) %>% summarize(avg_APR = mean(APR_2014)) %>% arrange(desc(avg_APR))
+```
+
+## What is Feature Selection?
+
+- Any method designed to help include relevant variables in the model and exclude irrelevant variables
+
+- Can be automatic based on specific criteria, or manual
+
+- Most models don't need more data, they need better feature selection
+
+- Easiest way to manually select features: visualize the data
+
+## Visualizing Data with ggplot2
+
+Basic syntax:
+
+- Set up a plot with the `ggplot()` command and tell it where to look for variables
+
+- Add one or more `geom` elements to indicate what type of plot to make
+
+- Customize the plot by adding or changing `theme` elements
+
+Advantages of ggplot2:
+
+- Build production-quality graphs from the ground up in an intuitive way
+
+- Modular: save intermediate steps and fix problems one at a time
+
+- Save "template" graphs as variables and reuse them later in the code
+
+## Histogram Example
+
+Suppose we want to obtain a histogram of the 2014 eligibility rates. We first set up our plot:
+
+```{r ggplot1}
+plot1 <- ggplot(data = APR, mapping = aes(x = ELIG_RATE_2014))
+```
+
+There are three important things here:
+
+- We start off by assigning our plot to a variable
+    
+- The `data` argument tells us where to look for the variable(s) we want
+    
+- The `aes` command tells us which variables are mapped to different axes, colors, etc.
+    
+## Histogram Example
+
+Next, we add a histogram:
+
+```{r ggplot2}
+plot1_hist <- plot1 + geom_histogram(center = 0.95, binwidth = 0.01)
+```
+
+The `geom_histogram` function takes two additional arguments:
+
+- `center` is the center of one bin
+    
+- `binwidth` is the width of each bin
+    
+By specifying these arguments, we can completely specify the bins of the histogram
+
+## Histogram Example
+
+Finally, we add some labels and print our graph:
+
+```{r ggplot3}
+plot1_labeled <- plot1_hist + labs(title = "Eligibility Rate (2014)", x = "Eligibility Rate", y = "Number of Schools")
+print(plot1_labeled)
+```
+
+## Adding Color
+
+Be aware that there are two kinds of color to add:
+
+- `color` refers to the color of points on a scatterplot
+
+- `fill` refers to the color of bars on a bar plot or histogram
+
+- Sometimes `color` and `fill` take on other meanings depending on the `geom` you are adding
+
+Both `color` and `fill` can take one of two types of values:
+
+- A single color name recognized by R, such as `goldenrod`
+
+- A variable in the data frame, indicating to use different colors for different groups
+
+## Adding Color: Example
+
+```{r ggplot_color1, eval = F}
+plot1_color <- ggplot(data = APR, mapping = aes(x = ELIG_RATE_2014, fill = as.factor(SCL_PRIVATE)))
+plot1_color_hist <- plot1_color + geom_histogram(center = 0.95, binwidth = 0.01)
+plot1_color_labeled <- plot1_color_hist + labs(title = "Eligibility Rate (2014)", x = "Eligibility Rate", y = "Number of Schools")
+print(plot1_color_labeled)
+```
+
+## Adding Color: Example
+
+```{r ggplot_color2, echo = F, eval = T}
+plot1_color <- plot1 <- ggplot(data = APR, mapping = aes(x = ELIG_RATE_2014, fill = as.factor(SCL_PRIVATE)))
+plot1_color_hist <- plot1_color + geom_histogram(center = 0.95, binwidth = 0.01)
+plot1_color_labeled <- plot1_color_hist + labs(title = "Eligibility Rate (2014)", x = "Eligibility Rate", y = "Number of Schools")
+print(plot1_color_labeled)
+```
+
+## Using Themes
+
+This graph is not production-quality. We want to do several things:
+
+- Get rid of the gray background
+
+- Center the title
+
+- Change the colors from their default settings
+
+- Move the legend somewhere else
+
+- Make the legend informative
+
+All of these are done using `theme` commands. ggplot2 has several built-in themes. Two that I like are `theme_bw` and `theme_minimal`.
+
+## Built-In Themes
+
+`theme_bw` produces a nice black frame around the plot:
+
+```{r themebw}
+plot1_bw <- plot1_color_labeled + theme_bw()
+print(plot1_bw)
+```
+
+## Built-In Themes
+
+`theme_minimal` gets rid of pretty much everything but a few gridlines:
+
+```{r thememinimal}
+plot1_minimal <- plot1_color_labeled + theme_minimal()
+print(plot1_minimal)
+```
+
+## Customizing a Theme
+
+Once we have a built-in theme we like, we can start changing `elements` using our own customization commands. To use a command, we need to know three things:
+
+- The name of the thing we want to change
+
+- The type of element (text, rectangle, etc.) it is, if any
+
+- The things we can change about it
+
+This is non-trivial and requires lots of looking at the help!
+
+## Changing Colors
+
+The `scale_*_manual` command is versatile, changing colors and legend information at the same time!
+
+```{r scalefill, eval = F}
+plot1_colorchange <- plot1_minimal + scale_fill_manual(name = "Type of School", labels = c("0"= "Public", "1" = "Private"), values = c("1" = "darkred", "0" = "navy"))
+print(plot1_colorchange)
+```
+
+Here the command takes three arguments:
+
+- `name`: the title of the legend showing the colors
+
+- `labels`: a vector (`c()`) that maps the categories to specific category names
+
+- `values`: a vector (`c()`) that maps the categories to specific colors
+
+## Changing Colors
+
+```{r scalefill_eval, echo = F, eval = T}
+plot1_colorchange <- plot1_minimal + scale_fill_manual(name = "Type of School", labels = c("Public", "Private"), values = c("navy", "darkred"))
+print(plot1_colorchange)
+```
+
+## Theme Arguments
+
+Centering the title:
+
+```{r center_title}
+plot1_centered <- plot1_colorchange + theme(plot.title = element_text(hjust = 0.5))
+```
+
+- The `hjust = 0.5` command indicates to center the title halfway between the left and right margins.
+
+Moving the legend:
+
+```{r legend_position}
+plot1_legend_bottom <- plot1_centered + theme(legend.position = "bottom")
+```
+
+## Combining Multiple Theme Elements
+
+We can technically combine both of these changes into a single `theme()` command:
+
+```{r final_histogram}
+plot1_final <- plot1_colorchange + theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom")
+print(plot1_final)
+```
+
+## Plotting by Group
+
+ggplot2 includes two very powerful ways to `facet`, or produce a separate plot for each group (or a combination of groups). To produce a separate plot for each group, we use the `facet_wrap()` command:
+
+```{r facet_wrap}
+facet_titles <- c("1" = "Bowl", "2" = "Championship")
+plot1_faceted <- plot1_final + facet_wrap(~as.factor(SUBDIVISION), labeller = labeller(.cols = facet_titles))
+print(plot1_faceted)
+```
+
+## Plotting by Groups
+
+We can also facet into a grid of plots at each combination of two variables:
+
+```{r facet_grid}
+row_titles <- c("1" = "HBCU", "2" = "Not HBCU")
+column_titles <- c("1" = "Bowl", "2" = "Championship")
+plot1_gridded <- plot1_final + facet_grid(as.factor(SCL_HBCU)~as.factor(SUBDIVISION), labeller = labeller(.rows = row_titles, .cols = column_titles))
+print(plot1_gridded)
+
+```
+
+## Visualization Activity
+
+We want to investigate how the relationship between eligibility rate and retention rate changes among the ten different Bowl Subdivision conferences. 
+
+Start off with this code:
+
+```{r ggjitter}
+FBS <- APR %>% filter(SUBDIVISION == 1, CONFERENCE != "Independent")
+plot2 <- ggplot(data = FBS, mapping = aes(x = ELIG_RATE_2014, y = RET_RATE_2014)) + geom_jitter()
+```
+
+```{r ggjitter initial, echo = F}
+print(plot2)
+```
+
+## Visualization Activity
+
+Start off with this code:
+
+```{r ggjitter_initial}
+FBS <- APR %>% filter(SUBDIVISION == 1, CONFERENCE != "Independent")
+plot2 <- ggplot(data = FBS, mapping = aes(x = ELIG_RATE_2014, y = RET_RATE_2014)) + geom_jitter()
+```
+
+
+And produce this plot:
+
+```{r ggsolution, echo = F}
+plot2_final <- ggplot(data = FBS, mapping = aes(x = ELIG_RATE_2014, y = RET_RATE_2014, color = as.factor(SCL_PRIVATE))) + geom_jitter() + labs(x = "Eligibility Rate", y = "Retention Rate", title = "Retention vs. Eligibility Rate (2014)") + theme_minimal() + scale_color_manual(name = "Type of School", labels = c("Public", "Private"), values = c("blue", "orange")) + theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom") + facet_wrap(~CONFERENCE)
+print(plot2_final)
+```
+
+## Activity Hints
+
+- You will need to start by including a `color = ` argument in your `ggplot` command
+
+- This means that you will use `scale_color_manual` to change your color scheme
+
+- `geom_jitter()` produces a jittered scatterplot so that you can see points "on top" of each other
+
+- You do not need to include a `labeller = ` argument when you start faceting
+
+- Think about whether you have one variable to facet by (`facet_wrap`) or two (`facet_grid`)
+
+## Unsupervised Learning: Benefits and Challenges
+
+- Often considered part of exploratory data analysis
+
+- Learn about relationships between observations and between variables without an obvious "right" answer
+
+- We have no way of checking whether our answer is good
+
+## K-Means Clustering
+
+- Simple method for finding subgroups in our observations that are similar with respect to a set of numerical variables
+
+- Goal: assign each observation to one of k clusters such that:
+
+    - Each observation is in exactly one cluster
+    
+    - The within-cluster variation is as small as possible
+    
+- In k-means clustering, we try to minimize the sum of squared distances (over all k clusters) between each observation in a cluster and the (multivariate) mean of the cluster
+
+
+## Before We Start Clustering
+
+- Any technique involving squared distance is extremely sensitive to scale
+
+- Variables with a lot of variation will contribute much more to the sum of squared distances than variables with only a little bit
+
+- We need to "standardize" or "scale" our values to remove this effect
+
+
+```{r k-means setup 1}
+kmeans_2013_data <- APR %>% filter(ELIG_RATE_2013 > 0, RET_RATE_2013 > 0) %>% select(ELIG_RATE_2013, RET_RATE_2013)
+
+# Scale variables
+kmeans_2013_data_scaled <- scale(kmeans_2013_data)
+
+```
+
+## Reproducing Our Clusters
+
+We start k-means clustering by randomly assigning data points. In order to reproduce our results, we will need to set a seed for R's random number generation algorithm.
+
+```{r k-means setup 2}
+set.seed(122)
+```
+
+Once we set a seed, we ensure that "random" numbers can be reliably reproduced. This is very important for replicating simulations!
+
+## Randomly Assigning Clusters
+
+```{r k-means step 1, echo = FALSE}
+n <- dim(kmeans_2013_data_scaled)[1]
+cluster1 <- sample.int(3, size = n, replace = T)
+km1 <- cbind(kmeans_2013_data, cluster1)
+km1means <- km1 %>% group_by(cluster1) %>% summarize(EL = mean(ELIG_RATE_2013), RET = mean(RET_RATE_2013))
+ggplot(km1, mapping = aes(x = ELIG_RATE_2013, y = RET_RATE_2013)) + theme_minimal() + geom_jitter(aes(col = as.factor(cluster1))) + theme(legend.position = "none") + labs(title = "Step 1: Initial Assignment", x = "Eligibility Rate (2013)", y = "Retention Rate (2013)") + annotate("point", x = km1means[[2]], y = km1means[[3]], col = c(2,3,4), size = 8, shape = 1, stroke = 3)
+```
+
+## Reassigning Clusters
+
+```{r kmeans step 2a, echo = FALSE}
+
+clusterdist <- data.frame(dist1 = apply(kmeans_2013_data[-1], 1, function(x) sum(x - km1means[1, 2:3])^2), dist2 = apply(kmeans_2013_data[-1], 1, function(x) sum(x - km1means[2, 2:3])^2), dist3 = apply(kmeans_2013_data[-1], 1, function(x) sum(x - km1means[3, 2:3])^2))
+new.clusters <- apply(clusterdist, 1, which.min)
+
+km1new <- cbind(km1, new.clusters)
+
+ggplot(km1new, mapping = aes(x = ELIG_RATE_2013, y = RET_RATE_2013)) + theme_minimal() + geom_jitter(aes(col = as.factor(new.clusters))) + theme(legend.position = "none") + labs(title = "Step 2a: Reassign Clusters", x = "Eligibility Rate (2013)", y = "Retention Rate (2013)") + annotate("point", x = km1means[[2]], y = km1means[[3]], col = c(2,3,4), size = 8, shape = 1, stroke = 3)
+
+```
+
+## Computing the New Means
+
+```{r echo = FALSE}
+km2means <- km1new %>% group_by(new.clusters) %>% summarize(EL = mean(ELIG_RATE_2013), RET = mean(RET_RATE_2013))
+ggplot(km1new, mapping = aes(x = ELIG_RATE_2013, y = RET_RATE_2013)) + theme_minimal() + geom_jitter(aes(col = as.factor(new.clusters))) + theme(legend.position = "none") + labs(title = "Step 2b: Compute the New Centers", x = "Eligibility Rate (2013)", y = "Retention Rate (2013)") + annotate("point", x = km2means[[2]], y = km2means[[3]], col = c(2,3,4), size = 8, shape = 1, stroke = 3)
+
+```
+
+## Repeat Until Convergence
+
+```{r echo = F}
+clusterdist <- data.frame(dist1 = apply(kmeans_2013_data[-1], 1, function(x) sum(x - km2means[1, 2:3])^2), dist2 = apply(kmeans_2013_data[-1], 1, function(x) sum(x - km2means[2, 2:3])^2), dist3 = apply(kmeans_2013_data[-1], 1, function(x) sum(x - km2means[3, 2:3])^2))
+new.clusters <- apply(clusterdist, 1, which.min)
+
+km1new <- cbind(km1, new.clusters)
+
+ggplot(km1new, mapping = aes(x = ELIG_RATE_2013, y = RET_RATE_2013)) + theme_minimal() + geom_jitter(aes(col = as.factor(new.clusters))) + theme(legend.position = "none") + labs(title = "Step 2a: Reassign Clusters", x = "Eligibility Rate (2013)", y = "Retention Rate (2013)") + annotate("point", x = km2means[[2]], y = km2means[[3]], col = c(2,3,4), size = 8, shape = 1, stroke = 3)
+
+```
+
+## Repeat Until Convergence
+
+```{r echo = FALSE}
+km3means <- km1new %>% group_by(new.clusters) %>% summarize(EL = mean(ELIG_RATE_2013), RET = mean(RET_RATE_2013))
+ggplot(km1new, mapping = aes(x = ELIG_RATE_2013, y = RET_RATE_2013)) + theme_minimal() + geom_jitter(aes(col = as.factor(new.clusters))) + theme(legend.position = "none") + labs(title = "Step 2b: Compute the New Centers", x = "Eligibility Rate (2013)", y = "Retention Rate (2013)") + annotate("point", x = km3means[[2]], y = km3means[[3]], col = c(2,3,4), size = 8, shape = 1, stroke = 3)
+
+```
+
+## When Points Stop Changing Clusters...
+
+```{r echo = F}
+clusterdist <- data.frame(dist1 = apply(kmeans_2013_data[-1], 1, function(x) sum(x - km3means[1, 2:3])^2), dist2 = apply(kmeans_2013_data[-1], 1, function(x) sum(x - km3means[2, 2:3])^2), dist3 = apply(kmeans_2013_data[-1], 1, function(x) sum(x - km3means[3, 2:3])^2))
+new.clusters <- apply(clusterdist, 1, which.min)
+
+km1new <- cbind(km1, new.clusters)
+
+ggplot(km1new, mapping = aes(x = ELIG_RATE_2013, y = RET_RATE_2013)) + theme_minimal() + geom_jitter(aes(col = as.factor(new.clusters))) + theme(legend.position = "none") + labs(title = "Step 2a: Reassign Clusters", x = "Eligibility Rate (2013)", y = "Retention Rate (2013)") + annotate("point", x = km3means[[2]], y = km3means[[3]], col = c(2,3,4), size = 8, shape = 1, stroke = 3)
+
+```
+
+## ...We Have Convergence
+
+```{r echo = FALSE}
+km3means <- km1new %>% group_by(new.clusters) %>% summarize(EL = mean(ELIG_RATE_2013), RET = mean(RET_RATE_2013))
+ggplot(km1new, mapping = aes(x = ELIG_RATE_2013, y = RET_RATE_2013)) + theme_minimal() + geom_jitter(aes(col = as.factor(new.clusters))) + theme(legend.position = "none") + labs(title = "Step 2b: Compute the New Centers", x = "Eligibility Rate (2013)", y = "Retention Rate (2013)") + annotate("point", x = km3means[[2]], y = km3means[[3]], col = c(2,3,4), size = 8, shape = 1, stroke = 3)
+
+```
+
+
+## Exploratory Data Analysis with K-Means
+
+The R function `kmeans()` automatically creates clusters for you! It takes two arguments:
+
+1. A data frame with only numerical variables, preferably scaled in advance
+2. The number of clusters you want
+
+You should store the results in a variable so that you can plot it later
+
+Example code:
+
+```{r kmeans2}
+# The centers argument indicates the number of clusters
+kmeans_2 <- kmeans(kmeans_2013_data_scaled, centers = 5)
+```
+
+## Exploratory Data Analysis with K-Means
+
+Once your clustering algorithm has run, you can get the cluster numbers out...
+
+```{r extract clusters}
+# the as.factor() command indicates to make it a categorical variable
+Cluster <- as.factor(kmeans_2$cluster)
+```
+
+...and add it to your original data frame
+
+```{r add cluster numbers}
+# The cbind() command indicates to merge two data frames or vectors with the same number of rows/elements
+km_final <- cbind(kmeans_2013_data, Cluster)
+```
+
+Now we can use `Cluster` in our ggplot commands to show the clusters:
+
+```{r ggplot clusters, eval = F, echo = T}
+ggplot(km_final, aes(x = ELIG_RATE_2013, y = RET_RATE_2013, color = Cluster)) + geom_jitter()
+```
+
+## Exploratory Data Analysis with K-Means
+
+
+```{r ggplot clusters 2, eval = T, echo = FALSE}
+ggplot(km_final, aes(x = ELIG_RATE_2013, y = RET_RATE_2013, color = Cluster)) + geom_jitter()
+```
+
+## K-Means Clustering: Activity
+
+Let's run a k-means clustering algorithm to divide our colleges into 3 groups based on the number of athletes and the APR in 2014. First we'll get the data:
+
+```{r }
+# We have to do pre-processing to remove missing data
+km_activity <- APR %>% select(NUM_OF_ATHLETES_2014, APR_2014) %>% filter(!is.na(NUM_OF_ATHLETES_2014))
+```
+
+1. Run a k-means clustering algorithm without scaling the data
+2. Scale the data and then run a k-means clustering algorithm
+3. Plot your results. How do the two results differ?
+4. If you have time, play around with changing the number of centers
+
+## Activity Solution: K-Means Code
+
+```{r}
+# Unscaled
+km_unscaled <- kmeans(km_activity, centers = 3)
+Cluster <- as.factor(km_unscaled$cluster)
+km_final_unscaled <- cbind(km_activity, Cluster)
+
+# Scaled
+km_scaled_raw <- scale(km_activity)
+km_scaled_cluster <- kmeans(km_scaled_raw, centers = 3)
+Cluster <- as.factor(km_scaled_cluster$cluster)
+km_final_scaled <- cbind(km_activity, Cluster)
+```
+
+## Activity Solution: Unscaled
+
+```{r activity clusters unscaled}
+ggplot(km_final_unscaled, aes(x = NUM_OF_ATHLETES_2014, y = APR_2014, color = Cluster)) + geom_jitter()
+```
+
+## Activity Solution: Scaled
+
+```{r activity clusters scaled}
+ggplot(km_final_scaled, aes(x = NUM_OF_ATHLETES_2014, y = APR_2014, color = Cluster)) + geom_point()
+```
+
+## Activity Solution: Interpretation
+
+- When we don't scale, it looks like the only thing that matters is APR, and we can divide the colleges into those with high, medium, and low APR
+
+- Because APR variability is much higher than variability in number of athletes, it dominates the clustering algorithm when we don't scale
+
+- When we scale, one group is still the "low APR" group, but now we have two different "high APR" groups: one with many athletes, and one with fewer athletes
+
+
+
+## Resampling Techniques: Motivation
+
+- Suppose we are interested in comparing the APR of public and private schools. We can think of the 2014 data as a representative sample of the APR that we could reasonably expect to measure in any given year.
+
+```{r resampling summarize mean}
+APR %>% group_by(SCL_PRIVATE) %>% summarize(count = n(), avg_APR = mean(APR_2014), sd_APR = sd(APR_2014))
+```
+
+- How do we know whether this 12-point difference in APR between the private schools (`SCL_PRIVATE = 1`) and public schools (`SCL_PRIVATE = 0`) is significant?
+
+## Resampling Techniques: Motivation
+
+- In your stats class you may have learned about z-test, t-test, and other mean inference based on the Central Limit Theorem
+
+- You probably had some sample size heuristic (n > 30) that said you were okay to do the test
+
+- But here it is not so clear that we actually want to do inference about the mean
+
+- Both groups are skewed left with some outliers, so the median may be the more informative measure of center
+
+## Resampling Techniques: Motivation
+
+```{r echo = TRUE}
+ggplot(data = APR, aes(x = APR_2014, fill = as.factor(SCL_PRIVATE))) + geom_histogram(binwidth = 10, center = 5) + theme_minimal() + scale_fill_discrete(name = "School Type", labels = c("Public", "Private")) + labs(x = "APR", y = "Number of Schools")
+```
+
+## Resampling Techniques: Motivation
+
+```{r resampling summarize median}
+APR %>% group_by(SCL_PRIVATE) %>% summarize(med_APR = median(APR_2014))
+```
+
+- How do we test whether the 16-point difference in median between private schools (`SCL_PRIVATE = 1`) and public schools (`SCL_PRIVATE = 0`) is significant?
+
+## Resampling Techniques: The Bootstrap
+
+- We will create many "simulated" data sets by sampling with replacement from our own data
+
+- We will compute the statistic(s) of interest in each simulated data set
+
+- We will obtain a "bootstrap sampling distribution" of the statistic
+
+- We do our learning by "pulling ourselves up by our own bootstraps"
+
+## Resampling Techniques: The Bootstrap
+
+- To perform the bootstrap, we first have to do some setup:
+
+```{r bootstrap1}
+B <- 10000 # the number of simulated data sets to create
+
+# get the public and private schools
+public_schools <- APR %>% filter(SCL_PRIVATE == 0)
+private_schools <- APR %>% filter(SCL_PRIVATE == 1)
+
+# get the number of each type of school
+n_public <- nrow(public_schools)
+n_private <- nrow(private_schools)
+
+public_medians <- numeric(B) # empty vector with B entries
+private_medians <- numeric(B)
+
+set.seed(1) # set a seed for reproducibility
+```
+
+## Resampling Techniques: The Bootstrap
+
+Now we will simulate `B` datasets from our original dataset, and obtain the median for each simulated dataset:
+
+```{r bootstrap2}
+for (i in 1:B){
+  # This is a "for loop" and we run through it B times
+  public_simulated <- sample(public_schools$APR_2014, size = n_public, replace = TRUE)
+  private_simulated <- sample(private_schools$APR_2014, size = n_private, replace = TRUE)
+  
+  public_medians[i] <- median(public_simulated)
+  private_medians[i] <- median(private_simulated)
+}
+```
+
+## Resampling Techniques: The Bootstrap
+
+```{r bootstrap3, echo = FALSE}
+
+school_medians <- data.frame(type = factor(rep(c("Private", "Public"), each = B), levels = c("Public", "Private")), median = c(private_medians, public_medians))
+
+ggplot(data = school_medians, aes(x = median, fill = type)) + geom_histogram(binwidth = 2, center = 3) + theme_minimal() + scale_fill_discrete(name = "School Type", labels = c("Public", "Private")) + labs(x = "Median APR", y = "Number of Bootstrap Samples")
+```
+
+## Resampling Techniques: The Bootstrap
+
+- What if we wanted a 95% Confidence Interval for the medians? 
+
+- Confidence is just an estimate of what proportion of the time (in the long run) the true population parameter will be in the interval
+
+- We just simulated 10,000 datasets! That's a "long enough" run for us to estimate with confidence!
+
+- We estimate our confidence intervals by merely finding the middle 95% of medians
+
+- This requires use of the `quantile()` function in R
+
+## Resampling Techniques: The Bootstrap
+
+```{r bootstrap ci}
+# Middle 95% means lower bound at 2.5% and upper bound at 97.5% 
+ci_public <- quantile(public_medians, c(0.025, 0.975))
+ci_private <- quantile(private_medians, c(0.025, 0.975))
+
+data.frame(Public = ci_public, Private = ci_private)
+```
+
+Since the confidence bounds do not overlap, we suspect that (at least with 95% confidence) there is a difference in the median APR of Private vs. Public schools.
+
+## Bootstrap: Activity
+
+We wish to see if an equivalent difference in APR exists between "Bowl Subdivision" schools (typically larger athletic programs) and "Championship Subdivision" schools (smaller athletic programs).
+
+Using the code in the previous slides as a template:
+
+- Obtain a histogram of the APR rates for "Bowl Subdivision" football schools (`SUBDIVISION = 1`) vs. "Championship Subdivision" football schools (`SUBDIVISION = 2`)
+
+- Obtain the sample median for each subdivision
+
+- Obtain 10,000 bootstrap samples for each subdivision and compute the median
+
+- Obtain 95% bootstrap confidence intervals for the median APR in each subdivision
+
+- Interpret your results
+
+- If you have time, try to make a histogram of your bootstrap samples. Is there any weirdness like we saw in the Public vs. Private example?
+
+## Bootstrap Activity: Solution
+
+```{r echo = TRUE}
+ggplot(data = APR, aes(x = APR_2014, fill = as.factor(SUBDIVISION))) + geom_histogram(binwidth = 10, center = 5) + theme_minimal() + scale_fill_discrete(name = "School Type", labels = c("Bowl", "Championship")) + labs(x = "APR", y = "Number of Schools")
+```
+
+## Bootstrap Activity: Solution
+
+```{r resampling activity summarize median}
+APR %>% group_by(SUBDIVISION) %>% summarize(num_schools = n(), avg_APR = mean(APR_2014), sd_APR = sd(APR_2014), med_APR = median(APR_2014))
+```
+
+Now we set up the bootstrap:
+
+```{r bootstrap1 activity}
+B <- 10000 # the number of simulated data sets to create
+
+# get the two subdivisions
+fbs_schools <- APR %>% filter(SUBDIVISION == 1)
+fcs_schools <- APR %>% filter(SUBDIVISION == 2)
+
+# get the number of each type of school
+n_fbs <- nrow(fbs_schools)
+n_fcs <- nrow(fcs_schools)
+
+fbs_medians <- numeric(B) # empty vector with B entries
+fcs_medians <- numeric(B)
+
+set.seed(2211) # set a seed for reproducibility
+```
+
+## Bootstrap Activity: Solution
+
+Now we simulate `B` datasets from our original data sets, and obtain the median for each dataset:
+
+```{r bootstrap2 activity}
+for (i in 1:B){
+  # This is a "for loop" and we run through it B times
+  fbs_simulated <- sample(fbs_schools$APR_2014, size = n_fbs, replace = TRUE)
+  fcs_simulated <- sample(fcs_schools$APR_2014, size = n_fcs, replace = TRUE)
+  
+  fbs_medians[i] <- median(fbs_simulated)
+  fcs_medians[i] <- median(fcs_simulated)
+}
+```
+
+## Bootstrap Activity: Solution
+
+Now we obtain the 95% bootstrap confidence interval for each group:
+
+```{r bootstrap ci activity}
+# Middle 95% means lower bound at 2.5% and upper bound at 97.5% 
+ci_fbs <- quantile(fbs_medians, c(0.025, 0.975))
+ci_fcs <- quantile(fcs_medians, c(0.025, 0.975))
+
+data.frame(Bowl = ci_fbs, Championship = ci_fcs)
+```
+
+Since the confidence bounds overlap, we do not suspect that (at least with 95% confidence) there is a difference in the median APR of Bowl vs. Championship Subdivision schools.
+
+## Bootstrap Activity: Solution
+
+```{r bootstrap3 activity, echo = FALSE}
+
+school_medians <- data.frame(type = factor(rep(c("Bowl", "Championship"), each = B), levels = c("Bowl", "Championship")), median = c(fbs_medians, fcs_medians))
+
+ggplot(data = school_medians, aes(x = median, fill = type)) + geom_histogram(binwidth = 2, center = 3) + theme_minimal() + scale_fill_discrete(name = "Subdivision", labels = c("Bowl", "Championship")) + labs(x = "Median APR", y = "Number of Bootstrap Samples")
+```
+
+## Introduction to Supervised Learning
+
+Recall from earlier, we asked the question:
+
+- Which is more important to get right:
+
+    - Explaining current observations?
+    
+    - Predicting future observations?
+
+In supervised learning, we want to predict a specific response for future observations.
+
+- How do we get future observations?
+
+## Training - Validation - Test Set Model
+
+We divide our data into three groups
+
+- *Training* set: a subset of data, used to fit many different models
+
+- *Validation* set: a subset of the training set, used to pick the "best" model
+
+- *Test* set: everything other than the training set, used to test how well the "best" model predicts future observations
+
+In many situations, you do not have a test set, only a validation set, so the validation set substitutes for the test set
+
+## Training - Validation - Test Set Model: Evaluation
+
+- We want to minimize error in the predictions of the test set
+
+- Many different definitions of error
+
+- Mean square error (MSE): average squared difference between actual and predicted response value
+
+- Misclassification rate: proportion of observations classified in the "wrong" category
+
+- MSE is popular for *regression* models and misclassification rate is popular for *classification* models
+
+- Many variations on MSE and misclassification rate that penalize different types of errors differently
+
+## Training - Validation - Test Set Model: Concerns
+
+- *Data Leakage*: information in the training data allows the creation of models with unrealistically high accuracy
+
+    - Incomplete separation of training and test data
+
+    - "Future" information used to predict the "past"
+
+    - Information the model should not have (for example, de-anonymized data)
+
+- When leakage exists, the final model exploits a relationship that does not appear in the real world, making the model useless for predicting "real" future observations
+
+## Single Validation Set Approach
+
+- Randomly select observations in the training data set to set aside for validation
+
+- How much you set aside typically depends on how big the data set is
+
+- Problem: error is highly variable depending on which observations are set aside
+
+- Problem: error tends to be overestimated because fewer observations are used
+
+- Is there a way to "rotate" training and validation data so that we can use all observations in training and validation sets?
+
+## Leave-One-Out Cross-Validation (LOOCV)
+
+- Fit the model using every observation in the training set except one
+
+- Obtain the error for the single observation left out
+
+- Repeat until every observation has been left out exactly once
+
+- Average the errors
+
+- Advantage: every observation is set aside exactly once, so error is fixed for each model (and generally lower than for a single validation set)
+
+- Problem: very slow when we have lots of data and lots of models
+
+- Can we speed up the process?
+
+## k-Fold Cross-Validation
+
+- Divide the training set into *k* groups (typically k = 5 or k = 10)
+
+- Fit the model using every group except one
+
+- The last group is the validation set; obtain its error
+
+- Repeat until all *k* groups have been used as the validation set exactly once
+
+- Average the errors, weighted by number of observations in each group
+
+- Compromise between the simplicity of the single validation set approach and the reduction in error from the LOOCV approach
+
+## k-Fold Cross-Validation: Linear Regression
+
+- Linear regression is a supervised learning technique
+
+- We have one response (y) and one or more predictors (x)
+
+- Most of our "usual" evaluation of linear regression evaluates the *fit* of the model on *observed* data
+
+- We do not know how well the linear regression model predicts *new* data
+
+- Too few predictors: we don't have enough information to predict new data accurately
+
+- Too many predictors: we are fitting randomness and our predictions on new data will be inaccurate
+
+- k-Fold Cross-Validation allows us to determine which set of predictors produces the smallest validation error rate
+
+## k-Fold Cross-Validation: Creating the Folds
+
+- We want to predict the 2013 APR from the 2012 eligbility rate and retention rate
+
+- We do not have a test set here, so we will use entire data set as a training set and use 10-fold validation to evaluate our linear regression models
+
+- First we use the `filter` function to remove observations with missing data for those variables
+
+- Next we divide the remaining observations into 10 groups
+
+```{r kfold1}
+training_data <- APR %>% filter(!is.na(APR_2013), !is.na(ELIG_RATE_2012),
+                                !is.na(RET_RATE_2012))
+
+k <- 10
+
+# assign rows to group numbers
+fold_numbers <- as.numeric(cut(seq(1, nrow(training_data)), breaks = k))
+
+# randomly permute the rows of the training data
+set.seed(900)
+training_randomized <- sample_frac(training_data)
+```
+
+- Now we have to go build our models
+
+## Step 1: Plot Your Data!
+
+```{r pairs}
+# remove first fold as first validation set
+training_1 <- training_randomized[fold_numbers != 1, ]
+validation_1 <- training_randomized[fold_numbers == 1, ]
+
+APR_plot1 <- ggplot(data = training_1, mapping = aes(x = ELIG_RATE_2012, y = APR_2013)) + geom_jitter() + labs(x = "Eligibility Rate", y = "APR", title = "2013 APR vs. 2012 Eligibility Rate") + theme_minimal() + theme(plot.title = element_text(hjust = 0.5))
+print(APR_plot1)
+```
+
+## Step 1: Plot Your Data!
+
+```{r pairs2, echo = FALSE, message = FALSE, warning = FALSE}
+APR_plot2 <- ggplot(data = training_1, mapping = aes(x = RET_RATE_2012, y = APR_2013)) + geom_jitter() + labs(x = "Retention Rate", y = "APR", title = "2013 APR vs. 2012 Retention Rate") + theme_minimal() + theme(plot.title = element_text(hjust = 0.5))
+print(APR_plot2)
+```
+
+## Step 1: Plot Your Data!
+
+- Ideally, you also make a scatterplot for each pair of predictors:
+
+```{r pairs4, echo = TRUE, message = FALSE, warning = FALSE}
+library(GGally)
+ggpairs(training_1, columns = c("APR_2013", "ELIG_RATE_2012", "RET_RATE_2012"), upper = list(continuous = "points"), lower = list(continuous = "cor"))
+```
+
+## Simple Linear Regression: Building a Model
+
+- Formula: $Response \sim Predictor$
+
+- Indicate where R should look to find those variables
+
+```{r slr1}
+lm_EL <- lm(APR_2013 ~ ELIG_RATE_2012, data = training_1)
+summary(lm_EL)
+```
+
+- Equation: $APR\_2013 = 591.77 + 389.07(ELIG\_RATE\_2012)$
+
+- $R^2: 0.38$
+
+## Simple Linear Regression: Interpretation
+
+- Equation: $APR\_2013 = 591.77 + 389.07(ELIG\_RATE\_2012)$
+
+- When Eligibility Rate is 0, we expect the 2013 APR to be 591.77
+
+- Intercept interpretation may or may not be particularly interesting
+
+- For a one-unit increase in Eligibility Rate, we expect the 2013 APR to increase by 389.07 points
+
+- Slope interpretation may or may not be useful depending on the scale (our eligibility rate is on a scale of 0-1)
+
+- We can rescale our variables to make these interpretations useful, but often don't until we have selected our final model
+
+## Multiple Linear Regression: Building a Model
+
+- Formula: $Response \sim Predictor_1 + Predictor_2 + Predictor_3 + \ldots$
+
+```{r mlr1}
+lm_EL_RET <- lm(APR_2013 ~ ELIG_RATE_2012 + RET_RATE_2012, data = training_1)
+summary(lm_EL_RET)
+```
+
+- Equation: $APR\_2013 = 519.29 + 345.27(ELIG\_RATE\_2012) + 119.78(RET\_RATE\_2012)$
+
+- $R^2: 0.39$
+
+- $R^2$ always goes up when we add more variables to a model
+
+## Multiple Linear Regression: Interpretation
+
+- Equation: $APR\_2013 = 519.29 + 345.27(ELIG\_RATE\_2012) + 119.78(RET\_RATE\_2012)$
+
+
+- Intercept: When Eligibility Rate is 0 *and* Retention Rate is 0, we expect the 2013 APR to be 519.29
+
+- Slope: For a one-unit increase in Eligibility Rate, we expect the 2013 APR to increase by 345.27 points, *holding the value of Retention Rate constant*.
+
+- Slope: For a one-unit increase in Retention Rate, we expect the 2013 APR to increase by 119.78 points, *holding the value of Eligibility Rate constant*.
+
+- In this model we assume that Eligibility Rate and Retention Rate independently affect APR
+
+## Multiple Linear Regression: Interaction Effects
+
+- Suppose we believe that the effect of Eligibility Rate on APR changes depending on the Retention Rate
+
+- We include this *interaction effect* in our formula by replacing `+` with `*`:
+
+```{r mlr interaction}
+lm_interaction <- lm(APR_2013 ~ ELIG_RATE_2012 * RET_RATE_2012, data = training_1)
+summary(lm_interaction)
+```
+
+- Equation: $APR\_2013 = 406.9 + 464.3(ELIG\_RATE\_2012) + 240.2(RET\_RATE\_2012) \\ - 127.5(ELIG\_RATE\_2012)(RET\_RATE\_2012)$
+
+## Multiple Linear Regression: Interaction Effects
+
+- Equation: $APR\_2013 = 406.9 + 464.3(ELIG\_RATE\_2012) + 240.2(RET\_RATE\_2012) \\ - 127.5(ELIG\_RATE\_2012)(RET\_RATE\_2012)$
+
+- Slope: For a one-unit increase in Eligibility Rate, we expect the 2013 APR to increase by 464.3 points, *minus 127.5 times the Retention Rate*.
+
+- Slope: For a one-unit increase in Retention Rate, we expect the 2013 APR to increase by 240.2 points, *minus 127.5 times the Eligibility Rate*.
+
+- The effect of Eligibility Rate is *weaker* when Retention Rate is high, and the effect of Retention Rate is *weaker* when Eligibility Rate is high
+
+## Linear Regression: Predicting New Data
+
+```{r new_predictions}
+lm_EL_predictions <- predict(lm_EL, newdata = validation_1)
+newdata_predictions <- data.frame(observed = validation_1$APR_2013, predicted = lm_EL_predictions)
+head(newdata_predictions)
+```
+
+- We can also use the `predict()` function to do inference:
+
+    - Confidence intervals for a mean response 
+    
+    - Prediction intervals for an individual response
+    
+## Linear Regression: Mean Squared Error
+
+- Average squared difference between the observed and predicted response values
+
+```{r mse}
+squared_residuals <- (validation_1$APR_2013 - lm_EL_predictions)^2
+mse <- mean(squared_residuals)
+print(mse)
+```
+
+- MSE is highly dependent on the scale of the response
+
+- It can be directly compared between models because the response variable stays the same
+
+## Linear Regression: k-Fold Cross-Validation
+
+- Build a `for` loop that runs $k$ times
+
+- Every time we go through the loop, we hold out one fold as our validation set, and fit each model on the rest of the data
+
+- Then we predict the values of the validation set, given the best linear regression line for each set of model parameters
+
+- Finally, we compute the mean squared error: average squared distance between the actual APR values and the predicted APR values
+
+- After the `for` loop is done, we compute the weighted average of MSE across all 10 folds, for each model
+
+- The best model is the model with lowest average MSE
+
+- We end by fitting the best model on the entire data set, to get coefficient estimates
+
+## Linear Regression: k-fold Cross-Validation
+
+- We have five models:
+
+    - One model with no predictors
+    - Two models with one predictor
+    - One model with both predictors but no interaction effect
+    - One model with both predictors and an interaction effect
+
+
+- Each time through the loop, we need to fit each model on the training set, and obtain the predictions on the validation set
+
+- Each time through the loop, we need to record the number of observations in the validation set and the MSE of each model:
+
+```{r loopvars}
+# set up our evaluation variables
+num_validation_observations <- numeric(k)
+MSE_NULL <- numeric(k)
+MSE_EL <- numeric(k)
+MSE_RET <- numeric(k)
+MSE_EL_RET <- numeric(k)
+MSE_int <- numeric(k)
+```
+
+## k-Fold Cross-Validation: For Loop
+
+```{r for loop}
+# write the for loop
+for (i in 1:k){
+  training_set <- training_randomized[fold_numbers != i, ]
+  validation_set <- training_randomized[fold_numbers == i, ]
+  
+  # Fit each model here
+  lm_NULL <- lm(APR_2013 ~ 1, data = training_set)
+  lm_EL <- lm(APR_2013 ~ ELIG_RATE_2012, data = training_set)
+  lm_RET <- lm(APR_2013 ~ RET_RATE_2012, data = training_set)
+  lm_EL_RET <- lm(APR_2013 ~ ELIG_RATE_2012 + RET_RATE_2012, data = training_set)
+  lm_int <- lm(APR_2013 ~ ELIG_RATE_2012*RET_RATE_2012, data = training_set)
+  
+  # Predictions go here
+  pred_NULL <- predict(lm_NULL, newdata = validation_set)
+  pred_EL <- predict(lm_EL, newdata = validation_set)
+  pred_RET <- predict(lm_RET, newdata = validation_set)  
+  pred_EL_RET <- predict(lm_EL_RET, newdata = validation_set)
+  pred_int <- predict(lm_int, newdata = validation_set)
+  
+  MSE_NULL[i] <- mean((validation_set$APR_2013 - pred_NULL)^2)
+  MSE_EL[i] <- mean((validation_set$APR_2013 - pred_EL)^2)
+  MSE_RET[i] <- mean((validation_set$APR_2013 - pred_RET)^2)
+  MSE_EL_RET[i] <- mean((validation_set$APR_2013 - pred_EL_RET)^2)
+  MSE_int[i] <- mean((validation_set$APR_2013 - pred_int)^2)
+    
+  num_validation_observations[i] <- nrow(validation_set)
+}
+```
+
+## Linear Regression: Model Selection
+
+```{r model selection}
+MSE_NULL_total <- sum(MSE_NULL * num_validation_observations)/sum(num_validation_observations)
+MSE_EL_total <- sum(MSE_EL * num_validation_observations)/sum(num_validation_observations)
+MSE_RET_total <- sum(MSE_RET * num_validation_observations)/sum(num_validation_observations)
+MSE_EL_RET_total <- sum(MSE_EL_RET * num_validation_observations)/sum(num_validation_observations)
+MSE_int_total <- sum(MSE_int * num_validation_observations)/sum(num_validation_observations)
+print(c(MSE_NULL_total, MSE_EL_total, MSE_RET_total, MSE_EL_RET_total, MSE_int_total))
+```
+
+- Model with no predictors is the worst
+
+- Model with eligibility rate and retention rate, but no interaction term, is the best
+
+## Linear Regression: Final Model
+
+- We select the model without the interaction term as our final model
+
+```{r model selected}
+lm_final <- lm(APR_2013 ~ ELIG_RATE_2012 + RET_RATE_2012, data = training_data)
+summary(lm_final)
+```
+
+- $APR\_2013 = 517.70 + 345.13(ELIG\_RATE\_2012) + 121.31(RET\_RATE\_2012)$
+
+## Linear Regression: Activity
+
+- Now we want to predict the 2014 APR from the 2013 statistics
+
+- Remove the observations with missing data for the 2014 APR and 2013 retention rate and  elgibility rate
+
+- Divide your data set into 5 folds to use a five-fold cross-validation approach
+
+- Create the five models using combinations of retention rate and eligibility rate
+
+- Which model has the lowest MSE according to the cross-validation approach? Did the same model work to predict APR in 2013 and in 2014, or did we get a different model for 2014?
+
+## Linear Regression: Activity Solutions
+
+```{r kfold2}
+training_data <- APR %>% filter(!is.na(APR_2014), !is.na(ELIG_RATE_2013),
+                                !is.na(RET_RATE_2013))
+
+k <- 5
+
+# assign rows to group numbers
+fold_numbers <- as.numeric(cut(seq(1, nrow(training_data)), breaks = k))
+
+# randomly permute the rows of the training data
+set.seed(9200)
+training_randomized <- sample_frac(training_data)
+
+num_validation_observations <- numeric(k)
+MSE_NULL <- numeric(k)
+MSE_EL <- numeric(k)
+MSE_RET <- numeric(k)
+MSE_EL_RET <- numeric(k)
+MSE_int <- numeric(k)
+```
+
+## Linear Regression: Activity Solutions
+
+```{r for loop2}
+# write the for loop
+for (i in 1:k){
+  training_set <- training_randomized[fold_numbers != i, ]
+  validation_set <- training_randomized[fold_numbers == i, ]
+  
+  # Fit each model here
+  lm_NULL <- lm(APR_2014 ~ 1, data = training_set)
+  lm_EL <- lm(APR_2014 ~ ELIG_RATE_2013, data = training_set)
+  lm_RET <- lm(APR_2014 ~ RET_RATE_2013, data = training_set)
+  lm_EL_RET <- lm(APR_2014 ~ ELIG_RATE_2013 + RET_RATE_2013, data = training_set)
+  lm_int <- lm(APR_2014 ~ ELIG_RATE_2013*RET_RATE_2013, data = training_set)
+  
+  # Predictions go here
+  pred_NULL <- predict(lm_NULL, newdata = validation_set)
+  pred_EL <- predict(lm_EL, newdata = validation_set)
+  pred_RET <- predict(lm_RET, newdata = validation_set)  
+  pred_EL_RET <- predict(lm_EL_RET, newdata = validation_set)
+  pred_int <- predict(lm_int, newdata = validation_set)
+  
+  MSE_NULL[i] <- mean((validation_set$APR_2013 - pred_NULL)^2)
+  MSE_EL[i] <- mean((validation_set$APR_2013 - pred_EL)^2)
+  MSE_RET[i] <- mean((validation_set$APR_2013 - pred_RET)^2)
+  MSE_EL_RET[i] <- mean((validation_set$APR_2013 - pred_EL_RET)^2)
+  MSE_int[i] <- mean((validation_set$APR_2013 - pred_int)^2)
+    
+  num_validation_observations[i] <- nrow(validation_set)
+}
+```
+
+## Linear Regression: Activity Solutions
+
+```{r model selection2}
+MSE_NULL_total <- sum(MSE_NULL * num_validation_observations)/sum(num_validation_observations)
+MSE_EL_total <- sum(MSE_EL * num_validation_observations)/sum(num_validation_observations)
+MSE_RET_total <- sum(MSE_RET * num_validation_observations)/sum(num_validation_observations)
+MSE_EL_RET_total <- sum(MSE_EL_RET * num_validation_observations)/sum(num_validation_observations)
+MSE_int_total <- sum(MSE_int * num_validation_observations)/sum(num_validation_observations)
+print(c(MSE_NULL_total, MSE_EL_total, MSE_RET_total, MSE_EL_RET_total, MSE_int_total))
+```
+
+- The best model for the 2014 APR still includes the previous year's eligibility rate and retention rate, but no interaction term
+
+
+## Linear Regression: Activity Solutions
+
+```{r model selected2}
+lm_final <- lm(APR_2014 ~ ELIG_RATE_2013 + RET_RATE_2013, data = training_data)
+summary(lm_final)
+```
+
+- $APR\_2014 = 569.84 + 321.16(ELIG\_RATE\_2013) + 90.26(RET\_RATE\_2013)$
+
+
+
+## What's Next?
+
+If you enjoyed this workshop, I highly recommend two books on which much of this workshop was based:
+
+- Wickham and Grolemund, *R for Data Science*
+
+- James, Witten, Hastie, and Tibshirani, *An Introduction to Statistical Learning with Applications in R*
+
+Both sets of authors have made an eBook version freely available
+
+## What's Next?
+
+- There are a lot more topics involved in statistical learning:
+
+    - Classification algorithms
+    
+    - Dimensionality reduction and automatic feature selection
+    
+    - Combining bootstrap with regression/classification algorithms
+    
+    - Including non-numeric data in algorithms
+
+- Stay tuned for workshops through CCAM and UEE covering more statistical learning!
